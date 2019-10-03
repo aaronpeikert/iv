@@ -12,12 +12,12 @@ MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.or
 <!-- badges: end -->
 
 Independend Validation is a procedure proposed by von Oertzen, which
-produces uncorrelated assessment sets. This property is assumed when
+produces independend assessment sets. This property is assumed when
 performing most statistical tests on the performance measures associated
 with the assesment sets. Importantly classical resampling procedures
 (like cross validation or bootstrapping) do violate this assumption,
-because even though the sample to beginn with are uncorrelated, the
-resulting assesment and holdout sets are not.
+because even when the original sample are independend, the resulting
+assesment and holdout sets are not.
 
 ## Installation
 
