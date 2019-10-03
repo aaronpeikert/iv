@@ -1,6 +1,6 @@
 Package: iv
 Type: Package
-Title: Implementation of Independend Validation (IV) in the 'rsample' framework
+Title: Independend Validation (IV) with 'rsample'
 Version: 0.1.0
 Authors@R: c(
     person(
