@@ -2,7 +2,7 @@ library("purrr")
 rs_obj <- iv(mtcars, m = 10)
 
 test_that("iv has allways an assesment set with one row", {
-  nrow <- map(rs_obj$splits, ~nrow(assessment(.x)))
+  nrow <- map(rs_obj$splits, ~nrow(rsample::assessment(.x)))
   expect_true(all(nrow == 1))
 })
 

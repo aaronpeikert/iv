@@ -11,16 +11,19 @@ test_that("rsample gives same result as manual version", {
   rmse <- function(x, y = 0)sqrt(mean((x-y)^2))
   manual <- rmse(rand[-seq_len(m)], result)
 
-  #----rsplit----
+  #----rsample----
   d <- tibble::tibble(x = rand)
   rs_obj <- iv(d, m = 20)
 
   holdout_mean <- function(splits, formula, ...){
     stopifnot(purrr::is_formula(formula))
     var <- as.character(formula)[2]
-    est <- mean(analysis(splits)[var])
-    error <- assessment(splits)[var] - est
+    est <- mean(rsample::analysis(splits)[[var]])
+    error <- rsample::assessment(splits)[[var]] - est
   }
 
-  rsplit <- rmse(vapply(rs_obj$split, holdout_mean , ~x))
+  rsample <- rmse(purrr::map_dbl(rs_obj$splits, holdout_mean , ~x))
+
+  #----compare----
+  expect_equal(rsample, manual)
 })

@@ -36,9 +36,9 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat (>= 2.1.0),
-    purrr
+    testthat (>= 2.1.0)
 Imports: 
-    rpart
+    purrr,
+    rsample
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
