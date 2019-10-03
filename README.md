@@ -29,7 +29,7 @@ You can install the development version from
 devtools::install_github("aaronpeikert/iv")
 ```
 
-by Aaron Peikert[![ORCID
+by [Aaron Peikert![ORCID
 iD](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0001-7813-818X)
-and Andreas Brandmaier [![ORCID
+and [Andreas Brandmaier![ORCID
 iD](https://orcid.org/sites/default/files/images/orcid_16x16.png)](http://orcid.org/0000-0001-8765-6982).
