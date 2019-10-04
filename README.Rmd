@@ -31,6 +31,52 @@ You can install the development version from [GitHub](https://github.com/) with:
 devtools::install_github("aaronpeikert/iv")
 ```
 
+## Examples
+
+```{r data}
+library(rsample)
+data("attrition")
+# downsample
+attrition <- attrition[sample(seq_len(nrow(attrition)), 100), ]
+```
+
+```{r iv}
+library(iv)
+iv_obj <- iv(attrition, m = 20)
+iv_obj
+```
+
+```{r lm_func}
+mod_form <- as.formula(Attrition ~ JobSatisfaction + Gender + MonthlyIncome)
+## splits will be the `rsplit` object
+holdout_results <- function(splits, ...) {
+  # Fit the model to the 90%
+  mod <- glm(..., data = analysis(splits), family = binomial)
+  # Save the 10%
+  holdout <- assessment(splits)
+  # `augment` will save the predictions with the holdout data set
+  res <- broom::augment(mod, newdata = holdout)
+  # Class predictions on the assessment set from class probs
+  lvls <- levels(holdout$Attrition)
+  predictions <- factor(ifelse(res$.fitted > 0, lvls[2], lvls[1]),
+                        levels = lvls)
+  # Calculate whether the prediction was correct
+  res$correct <- predictions == holdout$Attrition
+  # Return the assessment data set with the additional columns
+  res
+}
+```
+
+```{r model_purrr, warning=FALSE}
+library(purrr)
+iv_obj$results <- map(iv_obj$splits,
+                      holdout_results,
+                      mod_form)
+iv_obj$accuracy <- map_dbl(iv_obj$results, function(x) mean(x$correct))
+summary(iv_obj$accuracy)
+```
+
+
 by [Aaron Peikert![ORCID
 iD](https://orcid.org/sites/default/files/images/orcid_16x16.png)](https://orcid.org/0000-0001-7813-818X)
 and [Andreas Brandmaier![ORCID
