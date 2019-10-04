@@ -1,0 +1,129 @@
+---
+title: "Basics"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Working with rsets}
+output:
+  knitr:::html_vignette:
+    toc: yes
+---
+
+```{r ex_setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  digits = 3,
+  collapse = TRUE,
+  comment = "#>"
+  )
+options(digits = 3, width = 90)
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+## Introduction  
+
+This vignette is based on the first half of the [`vignette("Working_with_rsets", package = "rsample")`]()
+
+For illustration, the `attrition` data is used. From the help file:
+
+> These data are from the IBM Watson Analytics Lab. The website describes the data with "Uncover the factors that lead to employee attrition and explore important questions such as ‘show me a breakdown of distance from home by job role and attrition’ or 'compare average monthly income by education and attrition'. This is a fictional data set created by IBM data scientists." There are 1470 rows.
+The data can be accessed using 
+
+```{r attrition, message=FALSE}
+library(rsample)
+data("attrition")
+# downsample
+attrition <- attrition[sample(seq_len(nrow(attrition)), 100), ]
+names(attrition)
+table(attrition$Attrition)
+```
+
+## Model Assessment using loo_cv
+
+Let's fit a logistic regression model to the data with model terms for the job satisfaction, gender, and monthly income. 
+
+If we were fitting the model to the entire data set, we might model attrition using
+
+```r
+glm(Attrition ~ JobSatisfaction + Gender + MonthlyIncome, data = attrition, family = binomial)
+```
+
+For convenience, we'll create a formula object that will be used later:
+
+```{r form, message=FALSE}
+mod_form <- as.formula(Attrition ~ JobSatisfaction + Gender + MonthlyIncome)
+```
+
+To evaluate this model, we will leave one out cross-validation and use the 100 holdout samples to evaluate the overall accuracy of the model. 
+
+First, let's make the splits of the data:
+
+```{r model_vfold, message=FALSE}
+library(rsample)
+set.seed(4622)
+loo_obj <- loo_cv(attrition)
+loo_obj
+```
+
+Now let's write a function that will, for each resample:
+
+1. obtain the analysis data set (i.e. all samples except one)
+1. fit a logistic regression model
+1. predict the assessment data (the sample not used for the model) using the `broom` package
+1. determine if each sample was predicted correctly.
+
+Here is our function:
+
+```{r lm_func}
+## splits will be the `rsplit` object
+holdout_results <- function(splits, ...) {
+  # Fit the model to the 90%
+  mod <- glm(..., data = analysis(splits), family = binomial)
+  # Save the 10%
+  holdout <- assessment(splits)
+  # `augment` will save the predictions with the holdout data set
+  res <- broom::augment(mod, newdata = holdout)
+  # Class predictions on the assessment set from class probs
+  lvls <- levels(holdout$Attrition)
+  predictions <- factor(ifelse(res$.fitted > 0, lvls[2], lvls[1]),
+                        levels = lvls)
+  # Calculate whether the prediction was correct
+  res$correct <- predictions == holdout$Attrition
+  # Return the assessment data set with the additional columns
+  res
+}
+```
+
+To compute the accuarcy of the holdout for each of the 100 resamples, we'll use the `map` function from the `purrr` package:
+
+```{r model_purrr, warning=FALSE}
+library(purrr)
+loo_obj$results <- map(loo_obj$splits,
+                      holdout_results,
+                      mod_form)
+loo_obj
+```
+
+Now we can compute the accuracy values for all of the assessment data sets: 
+
+```{r model_acc_loo, warning=FALSE}
+loo_obj$accuracy <- map_dbl(loo_obj$results, function(x) mean(x$correct))
+summary(loo_obj$accuracy)
+```
+
+## Model Assessment using iv
+
+```{r model_iv, message=FALSE}
+library(iv)
+iv_obj <- iv(attrition, m = 20)
+iv_obj
+```
+
+```{r model_acc_iv, warning=FALSE}
+iv_obj$results <- map(iv_obj$splits,
+                      holdout_results,
+                      mod_form)
+iv_obj$accuracy <- map_dbl(iv_obj$results, function(x) mean(x$correct))
+summary(iv_obj$accuracy)
+```
+
