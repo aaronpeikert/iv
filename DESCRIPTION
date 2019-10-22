@@ -25,7 +25,7 @@ Authors@R: c(
     role = "ctb"
     )
   )
-Description: Independend Validation is a procedure proposed by von Oertzen,
+Description: Independend Validation is a procedure proposed by von Oertzen (in prep),
   which produces independend assessment sets. This property is assumed when
   performing most statistical tests on the performance measures associated with
   the assesment sets. Importantly classical resampling procedures (like

@@ -11,13 +11,13 @@ MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.or
 \!](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://github.com/aaronpeikert/iv/issues/new)
 <!-- badges: end -->
 
-Independend Validation is a procedure proposed by von Oertzen, which
-produces independend assessment sets. This property is assumed when
-performing most statistical tests on the performance measures associated
-with the assesment sets. Importantly classical resampling procedures
-(like cross validation or bootstrapping) do violate this assumption,
-because even when the original sample are independend, the resulting
-assesment and holdout sets are not.
+Independend Validation is a procedure proposed by von Oertzen (in prep),
+which produces independend assessment sets. This property is assumed
+when performing most statistical tests on the performance measures
+associated with the assesment sets. Importantly classical resampling
+procedures (like cross validation or bootstrapping) do violate this
+assumption, because even when the original sample are independend, the
+resulting assesment and holdout sets are not.
 
 ## Installation
 
@@ -89,7 +89,7 @@ iv_obj$results <- map(iv_obj$splits,
 iv_obj$accuracy <- map_dbl(iv_obj$results, function(x) mean(x$correct))
 summary(iv_obj$accuracy)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.0000  0.0000  1.0000  0.6125  1.0000  1.0000
+#>  0.0000  0.0000  0.0000  0.4875  1.0000  1.0000
 ```
 
 by [Aaron Peikert![ORCID
