@@ -34,7 +34,8 @@ devtools::install_github("aaronpeikert/iv")
 ## Examples
 
 ```{r data}
-library(rsample)
+# install.packages("modeldata")
+library(modeldata)
 data("attrition")
 # downsample
 attrition <- attrition[sample(seq_len(nrow(attrition)), 100), ]
@@ -42,6 +43,7 @@ attrition <- attrition[sample(seq_len(nrow(attrition)), 100), ]
 
 ```{r iv}
 library(iv)
+library(rsample)
 iv_obj <- iv(attrition, m = 20)
 iv_obj
 ```
